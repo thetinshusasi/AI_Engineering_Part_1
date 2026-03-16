@@ -1,0 +1,7 @@
+Techniques to achieve  Gen AI
+    - LLM
+    - Diffusion Models
+    - GAN
+    - Neural Radiance Fields
+    - Hybrid Models
+
