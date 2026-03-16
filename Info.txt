@@ -5,3 +5,15 @@ Techniques to achieve  Gen AI
     - Neural Radiance Fields
     - Hybrid Models
 
+activate env : conda activate nlp_course_end 
+
+Add env to jupyter kernel : python -m ipykernel install --user --name=nlp_course_env
+
+Text Preprocessing steps
+    - make everything lower case letter but be careful certain of importance Capital letters like US ==> us is worng (Country)
+    - remove Stop words ( and, of , a, to ....etc )
+    - Regex
+    - Tokenization
+    - Stemming
+    - Lemmatization
+    - N-grams
