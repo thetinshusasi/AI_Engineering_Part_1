@@ -14,6 +14,74 @@ Text Preprocessing steps
     - remove Stop words ( and, of , a, to ....etc )
     - Regex
     - Tokenization
-    - Stemming
-    - Lemmatization
-    - N-grams
+    - Stemming -    chopping off ending or removing suffixes, words to their base forms like connecting or connected => connect. 
+                    Downside sometimes word likes studies => stud  cause different words or not even meaningful. Reduce complexity by removing
+                    no of unique words and smaller dataset
+    - Lemmatization -   lemmatization stems the word to a more meaningful base form and ensures it does not lose it's meaning. Lemmatization works more
+                        intelligently, referencing a pre-defined dictionary containing the context of words and uses this when diminishing the word to the base form.    
+    - N-grams - An n-gram is simply a sequence of neighbouring n words (or tokens), where n can be any number. It helps us analyze the relationship betweeen
+                neighbouring words
+
+========================================================
+NLP Concepts — Code & Patterns (Session Notes)
+========================================================
+
+1. HOW pandas .plot AND plt ARE CONNECTED
+------------------------------------------
+- pandas .plot uses matplotlib as its backend engine.
+- When pandas draws a chart (.plot.barh(...)), it automatically becomes
+  the "current active figure" in matplotlib's global state.
+- plt (matplotlib.pyplot) functions like plt.title(), plt.ylabel(),
+  plt.xlabel() then act on that same active figure — no reference needed.
+- This is called the Implicit Global State Machine pattern.
+- Without "import matplotlib.pyplot as plt", the .plot() still works
+  but plt.title() etc. crash with NameError: name 'plt' is not defined.
+
+Coding Patterns used:
+  - Facade Pattern: pandas .plot hides complex matplotlib code behind a simple one-liner.
+  - Global State Machine: plt always modifies the last active figure automatically.
+  - Separation of Concerns: pandas handles data, matplotlib handles appearance.
+
+
+2. axis=1 IN data.apply()
+---------------------------
+  data['tokenized'] = data.apply(lambda x:
+                                  word_tokenize(
+                                  x['review_no_stopwords_no_punct']
+                                  ), axis=1)
+
+- apply() runs a function on every row or column of a DataFrame.
+- axis=0 (default) = apply function to each COLUMN (travels top to bottom).
+- axis=1 = apply function to each ROW (travels left to right).
+- With axis=1, x represents one full row, so x['column_name'] picks
+  the value from that column in that specific row.
+- word_tokenize() splits the text string into a list of word tokens.
+- The backslashes (\) are line continuation characters — the code is
+  one logical line split across multiple lines for readability.
+
+4. TIME & SPACE COMPLEXITY OF N-GRAM CALCULATION
+--------------------------------------------------
+Variables:
+  N = total number of tokens
+  n = gram size (1=unigram, 2=bigram, 3=trigram)
+  V = number of unique n-grams (vocabulary size)
+
+Time Complexity:
+  - Generating n-grams (nltk.ngrams):   O(N x n)
+  - Counting frequencies (value_counts): O(N x n)
+  - Sorting (sort_values):               O(V log V)
+  - TOTAL:                               O(N x n + V log V)
+  - For small fixed n (1,2,3) this simplifies to O(N)
+
+Space Complexity:
+  - Raw n-grams Series:    O(N x n)
+  - Frequency count dict:  O(V x n)
+  - TOTAL:                 O(N x n)
+
+Practical note:
+  - nltk.ngrams is a lazy generator (does not store all n-grams in memory).
+  - pd.Series() forces materialization into memory.
+  - For large corpora, large n values are expensive and cause data sparsity
+    (most n-grams appear only once). This is why n is typically kept <= 3.
+
+========================================================
