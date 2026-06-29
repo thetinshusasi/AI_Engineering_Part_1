@@ -85,3 +85,101 @@ Practical note:
     (most n-grams appear only once). This is why n is typically kept <= 3.
 
 ========================================================
+
+========================================================
+Text Tagging (Sequence Labeling)
+========================================================
+
+Overview:
+  - Text tagging assigns a label to each token (word) in a sentence — or to a span
+    of tokens — based on its role in the text.
+  - Also called sequence labeling: input is a sequence of words, output is a sequence
+    of tags (one label per token, or start/end tags for multi-word spans).
+  - Two main types in this course:
+      1. POS Tagging      — grammatical role (noun, verb, adjective, ...)
+      2. NER              — real-world entity type (person, org, location, date, ...)
+  - Example (POS):
+      "Google"  → PROPN (proper noun)
+      "founded" → VERB
+      "1998"    → NUM
+  - Example (NER):
+      "Larry Page" → PERSON
+      "Google"     → ORG
+      "California" → GPE
+  - Usually runs after tokenization; spaCy does tokenization + POS + NER in one pipeline.
+  - Pre-trained models (spaCy en_core_web_sm, NLTK, BERT) tag text without manual rules.
+
+Pros:
+  - Adds linguistic structure to raw text — grammar and meaning become machine-readable
+  - Enables smarter downstream NLP (lemmatization needs POS; search needs entities)
+  - Pre-trained taggers work out of the box on general English
+  - Same pipeline pattern for POS and NER — learn one, apply both
+  - Improves accuracy of parsing, sentiment, and information extraction vs raw text alone
+  - Tags can be used as features for ML models (e.g. only keep nouns/adjectives)
+
+Cons:
+  - Taggers trained on news/general text fail on slang, typos, and domain jargon
+  - Ambiguous words get wrong tags without full sentence context ("book" noun vs verb)
+  - POS and NER errors compound — bad tokenization → bad tags → bad entities
+  - Domain-specific tasks (medical, legal) often need custom models or fine-tuning
+  - Multi-word entities and nested structures are harder than single-token POS tags
+  - Language-specific — English models do not transfer well to other languages
+
+Use Cases:
+  - Text preprocessing — POS helps lemmatization pick correct word form (noun vs verb)
+  - Grammar checkers and writing assistants — detect wrong word usage
+  - Search & indexing — filter by nouns, entities, or key phrases
+  - Chatbots — understand sentence structure before generating a reply
+  - Information extraction pipelines — POS + NER as first stage before relation extraction
+  - Feature engineering — use tags as input to classifiers (spam, sentiment, intent)
+  - Document understanding — resumes, contracts, news articles
+
+========================================================
+Named Entity Recognition (NER)
+========================================================
+
+Overview:
+  - NER is a type of text tagging that finds and classifies named entities in text —
+    real-world objects referred to by name (people, companies, places, dates, etc.).
+  - Unlike POS (grammar), NER extracts semantic "who / what / where / when" from text.
+  - Tags apply to spans of tokens, not just single words:
+      "Stanford University" → ORG
+      "September 4, 1998"     → DATE
+      "Sundar Pichai"         → PERSON
+  - Common spaCy labels: PERSON, ORG, GPE, DATE, TIME, MONEY, PERCENT, PRODUCT, EVENT
+  - Typical workflow (from 3.3 NER notebook):
+      import spacy
+      nlp = spacy.load('en_core_web_sm')
+      doc = nlp(text)
+      for ent in doc.ents:
+          print(ent.text, ent.label_)
+  - Output: structured fields extracted from unstructured text.
+
+Pros:
+  - Automatically pulls names, dates, places, and organizations from documents
+  - Fast with pre-trained spaCy/transformer models — minimal setup
+  - Powers search, filtering, and auto-categorization without manual reading
+  - Foundation for knowledge graphs, relation extraction, and QA systems
+  - Reduces manual data entry (forms, invoices, resumes, support tickets)
+  - Cleaning text (lowercase, punctuation) can improve or change tagging results
+
+Cons:
+  - Misses domain-specific entities (drug names, legal clauses, product SKUs)
+  - Ambiguity — "Apple" (company vs fruit), "Washington" (person vs city vs state)
+  - Wrong labels on abbreviations and informal text (e.g. "PhD" → WORK_OF_ART in demo)
+  - Does not extract relationships — only identifies entities, not how they relate
+  - Nested entities are hard ("University of California, Berkeley")
+  - Custom entity types require training data and fine-tuning
+  - Performance varies by language, dialect, and text quality
+
+Use Cases:
+  - Resume parsing — extract candidate name, employers, skills, education, dates
+  - News & media — auto-tag people, organizations, locations in articles
+  - Customer support — route tickets by company, product, or location mentioned
+  - Healthcare — identify diseases, drugs, symptoms in clinical notes
+  - Finance & compliance — extract companies, amounts, dates from reports
+  - Search — "hotels in Paris" or "reviews mentioning Tesla"
+  - Chatbots — slot filling: "Book a flight to [GPE] on [DATE]"
+  - Social media monitoring — track brand names and locations in posts
+  - PII detection — find names, addresses, IDs for redaction in documents
+  - Knowledge graphs — populate entity nodes from raw text
