@@ -183,3 +183,146 @@ Use Cases:
   - Social media monitoring — track brand names and locations in posts
   - PII detection — find names, addresses, IDs for redaction in documents
   - Knowledge graphs — populate entity nodes from raw text
+
+
+========================================================
+1. Vectorizing Text
+========================================================
+
+What it is:
+  - Converting text (words, documents) into numerical vectors so ML models
+    can process them. Computers can't train on raw strings — they need numbers.
+  - Output is usually a matrix: rows = documents, columns = features (words or
+    dimensions). Each cell is a score (count, weight, or embedding value).
+  - Methods range from simple (Bag of Words, TF-IDF) to dense embeddings
+    (Word2Vec, GloVe, BERT).
+
+Pros:
+  - Makes text usable for classifiers, clustering, similarity search, etc.
+  - Many methods are fast, interpretable, and easy to implement (sklearn)
+  - Foundation for almost every classical NLP ML pipeline
+
+Cons:
+  - Simple methods lose word order and meaning context
+  - Sparse vectors can be huge (vocabulary size = number of dimensions)
+  - Choice of method strongly affects downstream model quality
+
+Use cases:
+  - Document classification (spam, sentiment, topic labels)
+  - Search / similarity (find related reviews or articles)
+  - Clustering documents, recommendation, feature input to any ML model
+
+When to use:
+  - Anytime you need to feed text into a machine learning model
+  - Start with BoW/TF-IDF for baselines; move to embeddings when you need
+    semantic meaning or better accuracy on nuanced language
+
+========================================================
+2. Bag of Words (BoW)
+========================================================
+
+What it is:
+  - Represents a document as a count (or presence) of each word in a fixed
+    vocabulary — order is ignored ("bag" = unordered multiset of words).
+  - Example: vocab = [cat, dog, sat]
+      "the cat sat" → [1, 0, 1]
+      "dog dog cat" → [1, 2, 0]
+  - Built with CountVectorizer (sklearn) after tokenization / preprocessing.
+
+Pros:
+  - Simple, fast, highly interpretable (each dimension = a word)
+  - Strong baseline for many text classification tasks
+  - No pre-trained model needed — works from your corpus alone
+
+Cons:
+  - Ignores word order and grammar ("not good" ≈ "good not")
+  - Treats all words equally — common words can dominate rare meaningful ones
+  - Sparse, high-dimensional; vocabulary grows with corpus size
+  - Synonyms ("car" vs "automobile") are unrelated dimensions
+
+Use cases:
+  - Spam detection, intent classification, simple sentiment baselines
+  - Quick feature extraction before logistic regression / Naive Bayes / SVM
+  - Exploring word frequency patterns in a corpus
+
+When to use:
+  - Small/medium corpora and classical ML baselines
+  - When interpretability matters (which words drive the prediction)
+  - Prefer TF-IDF over raw BoW when common words drown out signal
+
+========================================================
+3. TF-IDF (Term Frequency–Inverse Document Frequency)
+========================================================
+
+What it is:
+  - A weighted version of Bag of Words.
+  - TF (Term Frequency) = how often a term appears in a document
+  - IDF (Inverse Document Frequency) = down-weights terms that appear in
+    many documents (e.g. "the", "hotel") and boosts rarer, more distinctive terms
+  - Score ≈ TF × IDF — high when a word is frequent in this doc but rare overall
+  - Built with TfidfVectorizer (sklearn)
+
+Pros:
+  - Better than raw BoW at highlighting distinctive words
+  - Still sparse, interpretable, and fast
+  - Excellent default vectorizer for classical text ML
+  - Reduces impact of stopwords even if you didn't remove them all
+
+Cons:
+  - Still ignores word order and semantics
+  - Synonyms remain separate features
+  - Can underweight important but frequent domain terms (e.g. "room" in hotel reviews)
+  - Sparse matrices still get large with big vocabularies
+
+Use cases:
+  - Document classification and ranking
+  - Keyword extraction / finding characteristic terms per document
+  - Search engines (classic relevance scoring)
+  - Input features for sentiment, topic labels, clustering
+
+When to use:
+  - Default choice after BoW for most classical NLP pipelines
+  - When you care which words make a document unique vs the whole corpus
+  - Before upgrading to embeddings if BoW underperforms due to common-word noise
+
+========================================================
+4. Topic Modeling and LDA
+========================================================
+
+What it is:
+  - Topic modeling: unsupervised method to discover latent "topics" in a
+    collection of documents (themes that emerge from word co-occurrence).
+  - Each topic is a distribution over words (e.g. Topic A: hotel, room, staff;
+    Topic B: food, restaurant, menu).
+  - Each document is a mixture of topics (e.g. 70% Topic A, 30% Topic B).
+  - LDA (Latent Dirichlet Allocation): the most common generative probabilistic
+    topic model. Assumes documents are generated by sampling topics, then words
+    from those topics. Uses Dirichlet priors over topic and word distributions.
+  - Input is usually BoW or TF-IDF counts; output is topics + document-topic weights.
+
+Pros:
+  - Unsupervised — no labeled data required
+  - Interpretable topics (lists of top words per theme)
+  - Useful for exploring and summarizing large text corpora
+  - Documents get soft topic mixtures (not forced into one category)
+
+Cons:
+  - Number of topics (K) must be chosen / tuned
+  - Topics can be noisy, overlapping, or hard to name
+  - Assumes bag-of-words (ignores order); sensitive to preprocessing
+  - Not as strong as supervised classifiers when labels exist
+  - Results can vary with randomness / hyperparameters
+
+Use cases:
+  - Discover themes in reviews, news, research papers, support tickets
+  - Content organization / tagging without predefined categories
+  - Exploratory analysis before building a labeled classifier
+  - Recommendation and content browsing by theme
+
+When to use:
+  - Large unlabeled corpora where you want to discover themes
+  - When categories are unknown or too expensive to label manually
+  - Prefer supervised models (or embeddings + clustering) if you already have
+    clear labels or need precise classification accuracy
+  - Use LDA for interpretable classical topic discovery; consider BERTopic /
+    neural topic models when you need stronger semantic coherence
